@@ -1,6 +1,6 @@
 # cpp_assignments
 # Object_Oriented_Programming_task
 
-main menu that multi-function choices that represent multi-Object structure 
+main menu with multi-functional choices that represent Object Oriented structure 
 
 ----------------------------------- symbols differenet c++ file 
