@@ -1,0 +1,598 @@
+#include "Menu.h"
+#include <iostream>
+
+using namespace std;
+
+int main() {
+	//simply creating a menu instance, then calling mainMenu(). the rest is inside mainMenu().
+	Menu a;
+	a.mainMenu();
+	return 0;
+}
+#----------------------------------------------------------------------------------------------------------------------------------
+#include <iostream>
+using namespace std;
+#include "Clock.h"
+Clock::Clock(int hours,int minutes, int seconds)//constructor+ def constructor,if time not valid sets to 00:00:00
+{
+	if ((hours >= 0 && hours <= 23) && (minutes >= 0 && minutes <= 59) && (seconds >= 0 && seconds <= 59))
+	{
+		this->time[0] = hours;
+		this->time[1] = minutes;
+		this->time[2] = seconds;
+	}
+    else
+	{
+		this->time[0] = 0;
+		this->time[1] = 0;
+		this->time[2] = 0;
+	}
+}
+int Clock::getHou()
+{
+	return this->time[0];
+}
+int Clock::getMin()
+{
+	return this->time[1];
+}
+int Clock::getSec()
+{
+	return this->time[2];
+}
+void Clock::setHou(int hour)//sets new hour,0 if not valid
+{
+	if(hour >= 0 && hour <= 23){ this->time[0] = hour; }
+	else { this->time[0] = 0; }
+	  
+}
+void Clock::setMin(int minute)//sets new minute,0 if not valid
+{
+	if (minute >= 0 && minute <= 59) { this->time[1] = minute; }
+	else { this->time[1] = 0; }
+}
+void Clock::setSec(int second)//sets new second,0 if not valid
+{
+	if (second >= 0 && second <= 59) { this->time[2] = second; }
+	else { this->time[2] = 0; }
+}
+void Clock::printTime()//prints the time in xx:xx:xx format
+{
+	if (this->time[0] < 10) { cout << "0" << this->time[0] << ":"; }
+	else{ cout<< this->time[0] << ":"; }
+	if (this->time[1] < 10) { cout << "0" << this->time[1] << ":"; }
+	else{ cout<< this->time[1] << ":"; }
+	if(this->time[2]<10){ cout << "0" << this->time[2]<<endl; }
+	else{ cout<< this->time[2]<<endl; }
+}
+bool Clock::isMorning()//return T if time is earlier the 12:00
+{
+	return (this->time[0] < 12);
+}
+bool Clock::isAfternoon()//return T if time is between 12:00 to 17:59:59
+{
+	return (this->time[0] < 16 && this->time[0]>11);
+}
+bool Clock::isEvening()//return T if time is after 18:00 (include 18:00)
+{
+	return (this->time[0] > 16);
+
+}
+void Clock::tick()//add one second to time,1 segment became unvalid zeros the current segment and add to the next one +1.
+{
+	if (getSec() + 1 != 60) { setSec(getSec()+1); }
+	else
+	{
+		setSec(0);
+		if (getMin() + 1 != 60) { setMin(getMin()+ 1); }
+		else
+		{
+			setMin(0);
+			if (getHou() + 1 != 24) { setHou(getHou() + 1); }
+			else
+			{
+				setHou(0);
+			}
+		}
+	}
+}
+void Clock::addH()
+{
+	if (this->getHou() + 1 != 24) { this->setHou(this->getHou() + 1); }
+	else { this->setHou(0); }
+}
+void Clock::addM()
+{
+	if (this->getMin() + 1 != 60) { this->setMin(this->getMin() + 1); }
+	else { this->setMin(0); this->setHou(this->getHou() + 1); }
+}
+Clock::~Clock()
+{
+
+}
+#----------------------------------------------------------------------------------------------------------------------------------
+#include <iostream>
+using namespace std;
+class Clock
+{
+	int time[3];
+public:
+	Clock(int hours=0, int minutes=0, int seconds=0);
+	int getHou();
+	int getMin();
+	int getSec();
+	void setHou(int hour);
+	void setMin(int minute);
+	void setSec(int sec);
+	void printTime();
+	bool isMorning();
+	bool isAfternoon();
+	bool isEvening();
+	void tick();//tick the clock 1 sec
+	void addH();//add 1 hour to the clock
+	void addM();//add 1 min to the clock
+	virtual ~Clock();
+#----------------------------------------------------------------------------------------------------------------------------------
+#include <iostream>
+using namespace std;
+#include "Fraction.h"
+Fraction::Fraction(int nume, int deno)//constructor. if deno recieve 0 turn into 1 insted. fraction is reduced
+{
+	if (deno < 0)
+	{
+
+		nume *= -1; deno *= -1;
+	}
+	this->numerator = nume;
+	if (deno == 0) { this->denominator = 1; }
+	else { this->denominator = deno;}
+	
+	this->reduce();
+}
+int Fraction::getNume()
+{
+	return this->numerator;
+}
+int Fraction::getDeno()
+{
+	return this->denominator;
+}
+void Fraction::reduce()//reduce function build as a while loop
+{
+	int flag = 0;//flag for hold the status of numenator, 0 not changed,1 changed
+	if (this->numerator < 0)//change numenator to possitive value
+	{
+		this->numerator *= -1;
+		flag = 1;
+	}
+	int divider = 2;
+	while (divider<= this->numerator)//checks if can devide both nume and deno by any int number from 2 to sqrt(nume)
+	{
+		if ((this->numerator % divider == 0) && (denominator % divider)==0)
+		{
+			this->numerator = this->numerator / divider;//divide nume
+			this->denominator = this->denominator / divider;//divide deno
+			divider = 1;
+		}
+		divider++;
+	}
+	if (flag == 1)//change it back to negative value if needed
+	{
+		this->numerator *= -1;
+	}
+}
+void Fraction::setNumerator(int nume)//set new nume and reduce the fraction
+{
+	this->numerator = nume;
+	this->reduce();
+}
+void Fraction::setDenominator(int deno)//set new deno and reduce the fraction
+{
+	if (deno != 0)
+	{
+		this->denominator = deno;
+	}
+	this->reduce();
+}
+Fraction Fraction::add(Fraction frac1)//add the fractions acorrding to (a/b)+(c/d)=(a*d+c*b)/(b*d)
+{
+	int newNume = (frac1.getDeno() * this->numerator) + (this->denominator * frac1.getNume());
+	int newDeno = this->denominator * frac1.getDeno();
+	Fraction newFrac(newNume, newDeno);//creates new fraction
+	newFrac.reduce();//reduce the new fraction
+	return newFrac;
+}
+bool Fraction::isEquals(Fraction frac1)// return T if both nume's and both deno's are equal
+{
+	return (frac1.getNume() == this->numerator && frac1.getDeno() == this->denominator);
+	
+}
+void Fraction::printVal()
+{
+	cout << "The value is: " << this->numerator << "/" << this->denominator<<endl;
+}
+Fraction::~Fraction() {}//destructor
+#----------------------------------------------------------------------------------------------------------------------------------
+#include <iostream>
+using namespace std;
+
+class Fraction
+{
+	int numerator, denominator;
+
+public:
+	Fraction(int nume = 0, int deno = 1);//constructor+def constructor
+	int getNume();
+	int getDeno();
+	void setNumerator(int nume);
+	void setDenominator(int deno);
+	Fraction add(Fraction frac1);//add to fractions and return new reduced fraction
+	bool isEquals(Fraction frac1);//return T if this fraction= frac1,else F
+	void printVal();
+	virtual ~Fraction();//destructor
+private:
+	void reduce();//reduce the accepted fraction, will be called from constructor
+
+};
+#----------------------------------------------------------------------------------------------------------------------------------
+#include "Line.h"
+#include <cmath>
+#include <iostream>
+using namespace std;
+Line::Line(double coX1, double coY1, double coX2, double coY2)
+{
+	this->x1 = coX1;
+	this->y1 = coY1;
+	this->x2 = coX2;
+	this->y2 = coY2;
+	this->length = sqrt((x1 - x2)*(x1-x2) + (y1 - y2)*(y1 - y2));
+}
+double Line::getx1()
+{
+	return this->x1;
+}
+double Line::gety1()
+{
+	return this-> y1;
+}
+double Line::getx2()
+{
+	return this-> x2;
+
+}
+double Line::gety2()
+{
+	return this-> y2;
+
+}
+double Line::getLength()
+{
+	return this->length;
+
+}
+void Line::setx1(double coX1)
+{
+	this->x1 = coX1;
+}
+void Line::sety1(double coY1)
+{
+	this->y1 = coY1;
+}
+void Line::setx2(double coX2)
+{
+	this->x2 = coX2;
+}
+void Line::sety2(double coY2)
+{
+	this->y2 = coY2;
+}
+void Line::setLength(double coX1, double coY1, double coX2, double coY2)//body of line constructor
+{
+	this->x1 = coX1;
+	this->y1 = coY2;
+	this->x2 = coX2;
+	this->y2 = coY2;
+	this->length = abs(sqrt((x1 * x1) + (y1 * y1)) - sqrt((x2 * x2) + (y2 * y2)));//calculate line using cmath function
+}
+void Line::printLine()
+{
+
+	cout << "("<<this->x1<<","<<this->y1<<") --> ("<< this->x2<<","<< this->y2<<")\n"<<"the length is: "<< this->length<<endl;// prints the line coordinates and length
+}
+Line::~Line() {}//destructor
+#----------------------------------------------------------------------------------------------------------------------------------
+#include <iostream>
+using namespace std;
+class Line
+{
+	double x1, y1, x2, y2;
+	double length;
+    
+public:
+	Line(double coX1=0, double coY1=0, double coX2=0, double coY2=0);//constructor +def constructor with (0,0) as both points
+	double getx1();
+	double gety1();
+	double getx2();
+	double gety2();
+	double getLength();
+	void setx1(double coX1);
+	void sety1(double coY1);
+	void setx2(double coX2);
+	void sety2(double coY2);
+	void setLength(double coX1, double coY1, double coX2, double coY2);//sets new length by new coordinates
+	void printLine();
+	virtual ~Line();
+};
+#----------------------------------------------------------------------------------------------------------------------------------
+#include <iostream>
+using namespace std;
+#include "Menu.h"
+#include "Line.h"
+#include "Clock.h"
+#include "Fraction.h"
+
+void orderByMax(Line line1, Line line2, Line line3)//prints the lines from the longest line to the shortest
+{
+	Line ltemp;
+	Line lines[3] = { line1,line2,line3 };
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			if (lines[i].getLength() > lines[j].getLength())
+			{
+				ltemp = lines[i];
+				lines[i] = lines[j];
+				lines[j] = ltemp;
+			}
+		}
+	}
+	for (int k = 0; k < 3; k++)
+	{
+		cout << "cord: ";
+		lines[k].printLine();
+	}
+
+	
+}
+Menu::Menu()
+{
+	this->choice = 0;
+}
+void Menu::mainMenu()
+{
+	Line line1, line2, line3;//decleration of 3 line variables
+	double x11, x12, y11, y12;//coordinates for line1
+	double x21, x22, y21, y22;//coordinates for line2
+	double x31, x32, y31, y32;//coordinates for line3
+	Fraction f1, f2;//decleration of 2 fraction variables
+	int nume1, nume2, deno1, deno2;//numerators and denominator for 2 frictions
+	Clock clock1;//decleration of clock variable
+	int hours, minutes, seconds;
+	while (this->choice!=4)
+	{
+		cout << "(1) - line menu" << endl << "(2) - fraction menu" << endl << "(3) - clock menu" << endl << "(4) - exit"<<endl;
+		cin >> this->choice;
+		if (choice < 1 || choice>4)
+		{
+			cout << "illigal choice"<<endl;
+			choice = 0;
+		}
+		switch (this->choice)
+		{
+		case 1:
+		{
+			this->choice = 0;
+			
+			
+			cout << "Enter the first point of Line 1:"<<endl;
+			cin >> x11 >> y11;
+			cout << "Enter the second point of Line 1:" << endl;
+			cin >> x12>> y12;
+			line1 = Line(x11, y11, x12, y12);
+			cout << "Enter the first point of Line 2:" << endl;
+			cin >> x21 >> y21;
+			cout << "Enter the second point of Line 2:" << endl;
+			cin >> x22 >> y22;
+			line2 = Line(x21, y21, x22, y22);
+			cout << "Enter the first point of Line 3:\n";
+			cin >> x31 >> y31;
+			cout << "Enter the second point of Line 3:\n";
+			cin >> x32 >> y32;
+			line3 = Line(x31, y31, x32, y32);
+			while (this->choice!=5)
+			{
+				
+				cout << "<1> To view first Line coordinates and length." << endl << "<2> To view second Line coordinates and length." << endl << "<3> To view third Line coordinates and length.\n<4> To print line order by length"<< endl<<"<5> To exit"<< endl;
+				cin >> this->choice;
+				if(choice < 1 || choice>5)
+				{
+					cout << "illigal choice" << endl;
+					cout << "<1> To view first Line coordinates and length." << endl << "<2> To view second Line coordinates and length." << endl << "<3> To view third Line coordinates and length.\n<4> To print line order by length" << endl << "<5> To exit" << endl;
+
+					choice = 0;
+				}
+				switch (this->choice)
+				{
+				case 1:
+				{
+					cout << "the coordinate of line 1:" << endl;
+					line1.printLine();
+					break;
+				}
+				case 2:
+				{
+					cout << "the coordinate of line 2:" << endl;
+					line2.printLine();
+					break;
+				}
+				case 3:
+				{
+					cout << "the coordinate of line 3:" << endl;
+					line3.printLine();
+					break;
+				}
+				case 4:
+				{
+					cout << "the coordinate ordered from high to low(by length):\n";
+					orderByMax(line1,line2,line3);
+					break;
+				}
+				default:
+					break;
+				}
+
+
+			}
+			break;
+		}
+		case 2:
+		{
+			this->choice = 0;
+			cout << "Set the first fraction:" << endl << "Numerator: ";
+			cin >> nume1;
+			cout << "Denominator: ";
+			cin >> deno1;
+			f1 = Fraction(nume1, deno1);
+			cout << "Set the second fraction:" << endl << "Numerator: ";
+			cin >> nume2;
+			cout << "Denominator: ";
+			cin >> deno2;
+			f2 = Fraction(nume2, deno2);
+
+			while (this->choice!=5)
+			{
+				cout << "<1> calculate sum of f1 and f2." << endl << "<2> is equal?." << endl << "<3> print first fraction." << endl << "<4> print second fraction." << endl << "<5> exit." << endl;
+
+				cin >> this->choice;
+				if(choice < 1 || choice>5)
+				{
+					cout << "illigal choice" << endl;
+					cout << "<1> calculate sum of f1 and f2." << endl << "<2> is equal?." << endl << "<3> print first fraction." << endl << "<4> print second fraction." << endl << "<5> exit." << endl;
+
+					choice = 0;
+				}
+				switch (choice)
+				{
+				case 1:
+					{
+					f1.add(f2).printVal();
+						break;
+					}
+				case 2:
+					{
+						if (f1.isEquals(f2)) { cout << "equal" << endl; }
+						else {cout << "not equal" << endl;}
+						break;
+					}
+				case 3:
+					{
+						f1.printVal();
+						break;
+					}
+				case 4:
+					{
+						f2.printVal();
+						break;
+					}
+				default:
+					break;
+				}
+				
+			}
+			break;
+		}
+		case 3:
+		{
+			this->choice = 0;
+			cout << "Enter hours:" << endl;
+			cin >> hours;
+			cout << "Enter minutes:" << endl;
+			cin >> minutes;
+			cout << "Enter seconds:" << endl;
+			cin >> seconds;
+			clock1 = Clock(hours, minutes, seconds);
+			while (this->choice!=5)
+			{
+				cout<<"<1> what is the time"<<endl<<"<2> add second"<<endl<<"<3> add 10 seconds"<<endl<<"<4> add 02:30:15"<<endl<<"<5> exit"<<endl;
+				cin >> choice;
+				if(choice<1||choice>5)
+				{
+					cout << "illigal choice" << endl;
+					cout << "<1> what is the time" << endl << "<2> add second" << endl << "<3> add 10 seconds" << endl << "<4> add 02:30:15" << endl << "<5> exit" << endl;
+
+					choice = 0;
+				}
+				switch (choice)
+				{
+				case 1:
+				{
+					clock1.printTime();
+					break;
+				}
+				case 2:
+				{
+					clock1.tick();
+					clock1.printTime();
+					break;
+				}
+				case 3:
+				{
+					for (int i = 0; i < 10; i++)
+					{
+						clock1.tick();
+						clock1.printTime();
+					}
+					
+					break;
+				}
+				case 4:
+				{
+					for (int i = 0; i < 2; i++)
+					{
+						clock1.addH();
+					}
+					for (int j = 0; j < 30; j++)
+					{
+						clock1.addM();
+					}
+					for (int k = 0; k < 15; k++)
+					{
+						clock1.tick();
+					}
+					clock1.printTime();
+					break;
+				}
+				default:
+					break;
+				}
+	
+			}
+			break;
+		}
+		default:
+			
+			break;
+			
+		}
+		
+	}
+	cout << "Goodbye!" << endl;
+	
+}
+Menu::~Menu()
+{
+
+}
+#----------------------------------------------------------------------------------------------------------------------------------
+#include <iostream>
+using namespace std;
+class Menu
+{
+	int choice;
+public:
+	Menu();//constructor
+	void mainMenu();
+	virtual ~Menu();//destructor
+};
+
